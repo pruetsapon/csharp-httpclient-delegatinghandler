@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  csharp-httpclient-delegatinghandler:
+    image: ${DOCKER_REGISTRY-}csharphttpclientdelegatinghandler:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: csharp-httpclient-delegatinghandler/Dockerfile
