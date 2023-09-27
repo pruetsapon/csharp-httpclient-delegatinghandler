@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "csharp-httpclient-delegatinghandler": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
