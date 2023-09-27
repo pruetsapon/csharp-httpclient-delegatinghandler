@@ -1,6 +1,7 @@
 ﻿namespace csharp_httpclient_delegatinghandler.Configurations
 {
-    public class AuthorizationConfiguration
+    public class DataConfiguration
     {
+        public string? Url { get; set; }
     }
 }

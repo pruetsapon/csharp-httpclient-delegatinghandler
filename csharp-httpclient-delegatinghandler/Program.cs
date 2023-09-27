@@ -1,4 +1,7 @@
 ﻿using csharp_httpclient_delegatinghandler;
+using csharp_httpclient_delegatinghandler.Configurations;
+using csharp_httpclient_delegatinghandler.Handlers;
+using csharp_httpclient_delegatinghandler.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +23,13 @@ var loggerConfig = new LoggerConfiguration()
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.Configure<AppSettings>(configuration);
+builder.Services.AddSingleton(configuration.GetSection(typeof(AuthenticationConfiguration).Name).Get<AuthenticationConfiguration>() ?? throw new Exception("authentication service config is null."));
+builder.Services.AddSingleton(configuration.GetSection(typeof(DataConfiguration).Name).Get<DataConfiguration>() ?? throw new Exception("data service config is null."));
+builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
+builder.Services.AddTransient<AuthenticationDelegatingHandler>();
+builder.Services.AddHttpClient<IDataService, DataService>()
+                .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+builder.Services.AddMemoryCache();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(loggerConfig);
@@ -35,4 +45,8 @@ static void RunningApplication(IServiceProvider hostProvider)
     using IServiceScope serviceScope = hostProvider.CreateScope();
     IServiceProvider provider = serviceScope.ServiceProvider;
     var logger = provider.GetRequiredService<ILogger<AppSettings>>();
+    var dataService = provider.GetRequiredService<IDataService>();
+    var version = dataService.GetVersion().Result;
+
+    logger.LogInformation($"version: {version}");
 }
